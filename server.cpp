@@ -1,3 +1,5 @@
+#include <SFML/Graphics.hpp>
+
 #include <unistd.h> 
 #include <stdio.h> 
 #include <sys/socket.h> 
@@ -8,6 +10,7 @@
 #include "Game.h"
 
 #define PORT 8080 
+#define DISP_WIDTH 320
 
 using namespace std;
 
