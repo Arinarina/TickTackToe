@@ -60,6 +60,41 @@ Game::~Game() {
     delete[] moves;
 }
 
+void Game::setRenderWindow(sf::RenderWindow *window) {
+    this->window = window;
+}
+
+void Game::renderGameField() {
+    for (int i = 1; i <= side; i++) {
+        sf::Vertex line[] =
+        {
+            sf::Vertex(sf::Vector2f(i * (DISP_WIDTH / side), 0)),
+            sf::Vertex(sf::Vector2f(i * (DISP_WIDTH / side), 320))
+        };
+        (*window).draw(line, 2, sf::Lines);
+        line[0] = sf::Vertex(sf::Vector2f(0, i * (DISP_WIDTH / side)));
+        line[1] = sf::Vertex(sf::Vector2f(320, i * (DISP_WIDTH / side)));
+        (*window).draw(line, 2, sf::Lines);
+    }
+    // will be rendered on next tick
+}
+
+void Game::checkDisplayClosed(sf::RenderWindow *window) {
+    (*window).clear(sf::Color::Black);
+    while ((*window).isOpen())
+    {
+        sf::Event event;
+        while ((*window).pollEvent(event))
+        {
+
+            if (event.type == sf::Event::Closed)
+                (*window).close();
+        }
+
+        (*window).display();
+    }
+}
+
 // показываем инструкции
 void Game::showInstruction() 
 { 

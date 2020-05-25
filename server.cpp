@@ -7,10 +7,16 @@
 #include <netinet/in.h> 
 #include <iostream>
 #include <string.h>
+#include <functional>
+
 #include "Game.h"
 
 #define PORT 8080 
+
+// default field value
+int sizes = 5;
 #define DISP_WIDTH 320
+#define DISP_FULL_HEIGHT 400
 
 using namespace std;
 
@@ -66,10 +72,21 @@ int main(int argc, char const *argv[])
     cout << "Enter field sizes ( > 5)" << endl;
     int sizes;
     cin >> sizes;
+
+    sf::RenderWindow window(sf::VideoMode(DISP_WIDTH, DISP_FULL_HEIGHT), "Tick Tack Toe");
+    window.clear(sf::Color::Black);
+
     // задаем размеры игрового поля
     cout << "Field sizes is " << sizes << endl;
     // создаем игру
     Game *game = new Game(sizes);
+    game->setRenderWindow(&window);
+
+    sf::Thread thread(std::bind(Game::checkDisplayClosed, &window), &game);
+    thread.launch();
+
+    game->renderGameField();
+    
     // отсылаем клиенту размеры игрового поля
     int littleBuffer[1] = { sizes };
     send(new_socket , littleBuffer, 1, 0); 

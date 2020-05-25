@@ -85,7 +85,6 @@ int main()
         if (sf::Mouse::isButtonPressed(sf::Mouse::Left))
         {
             sf::Vector2i pos = sf::Mouse::getPosition(window);
-            // cout << pos.x << " " << pos.y << endl;
             int x, y;
             x = pos.x / (DISP_WIDTH / size);
             y = pos.y / (DISP_WIDTH / size);
