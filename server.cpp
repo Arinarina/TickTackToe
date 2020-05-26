@@ -82,8 +82,8 @@ int main(int argc, char const *argv[])
     Game *game = new Game(sizes);
     game->setRenderWindow(&window);
 
-    sf::Thread thread(std::bind(Game::checkDisplayClosed, &window), &game);
-    thread.launch();
+    // sf::Thread thread(std::bind(Game::checkDisplayClosed, &window), &game);
+    // thread.launch();
 
     game->renderGameField();
     
@@ -110,6 +110,8 @@ int main(int argc, char const *argv[])
         myBuffer[1] = y;
         // создаем новых ход
         int status = game->newMove(game->first, move, x, y);
+        game->clearText();
+        game->drawInfo(0);
         if (status == -1)
             break;
         move++;
@@ -120,9 +122,14 @@ int main(int argc, char const *argv[])
         cout << "Waiting...." << endl;
         // проверяем на победителя
         int gameEnd = game->checkWin(move, game->second);
-        if (gameEnd)
+        if (gameEnd) {
+            sleep(4);
             break;
+        }
         // ждем хода соперника
+
+        game->clearText();
+        game->drawInfo(1);
 		valread = recv(new_socket, myBuffer, sizeof(int) * 2, 0);
         cout << "Recived" << myBuffer[0] << " " << myBuffer[1] << endl;
 		// отмечаем ход соперника на поле
@@ -134,8 +141,11 @@ int main(int argc, char const *argv[])
         game->showBoard();
         // проверка на победителя
         gameEnd = game->checkWin(move, game->first);
-        if (gameEnd)
+
+        if (gameEnd == 1) {
+            sleep(4);
             break;
+        }
     }
 
     

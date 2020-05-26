@@ -91,7 +91,7 @@ void Game::checkDisplayClosed(sf::RenderWindow *window) {
                 (*window).close();
         }
 
-        (*window).display();
+        // (*window).display();
     }
 }
 
@@ -133,29 +133,24 @@ void Game::showBoard()
 // 5 в один столбец
 bool Game::rowCrossed() 
 { 
-    int xx, yy;
+    int xx = 0;
+    int yy = 0;
     int starting = 0;
     for (int i = 0; i < side; i++) 
     { 
-        while (starting + 4 < side) {
-            xx = 0;
-            yy = 0;
-            for (int j = starting; j < starting + 5; j++) {
-                // cout << j << " " << i << endl;;
-                if (board[i][j] == 'O') {
-                    xx++;
-                }
-                if (board[i][j] == 'X') {
-                    yy++;
-                }
+        for (int j = 0; j < side; j++) {
+            if (board[i][j] == 'X') {
+                xx++;
+                yy = 0;
             }
-            if (xx >= 5) {
+            if (board[i][j] == 'O') {
+                yy++;
+                xx = 0;
+            }
+
+            if ((xx >= 5) || (yy >= 5)) {
                 return true;
             }
-            if (yy >= 5) {
-                return true;
-            }
-            starting++;
         }
     } 
     return(false); 
@@ -164,28 +159,24 @@ bool Game::rowCrossed()
 // 5 в одну колонку
 bool Game::columnCrossed() 
 { 
-    int xx, yy;
+    int xx = 0;
+    int yy = 0;
     int starting = 0;
     for (int j = 0; j < side; j++) 
     { 
-        while (starting + 4 < side) {
-            xx = 0;
-            yy = 0;
-            for (int i = starting; i < starting + 5; i++) {
-                if (board[i][j] == 'O') {
-                    xx++;
-                }
-                if (board[i][j] == 'X') {
-                    yy++;
-                }
+        for (int i = 0; i < side; i++) {
+            if (board[i][j] == 'X') {
+                xx++;
+                yy = 0;
             }
-            if (xx >= 5) {
+            if (board[i][j] == 'O') {
+                yy++;
+                xx = 0;
+            }
+
+            if ((xx >= 5) || (yy >= 5)) {
                 return true;
             }
-            if (yy >= 5) {
-                return true;
-            }
-            starting++;
         }
     } 
     return(false); 
@@ -360,10 +351,17 @@ int Game::newMove(int turn, int move, int x, int y){
     }
     cout << x << " " << y << endl;
          
-    board[x][y] = currentSym; 
-         
+    board[x][y] = currentSym;
+    if (currentSym == firstMove) {
+        drawTick(x, y);
+    } else {
+        drawRound(x, y);
+    }
+
     cout << board[x][y] << " in " << moves[move] / side << " " << moves[move] %side << endl;
     showBoard();
+
+    (*window).display();
     return 0;
 }
 
@@ -375,12 +373,85 @@ int Game::checkWin(int move, int turn){
     }
     else if (rowCrossed() || columnCrossed() || diagonalCrossed())
     { 
-        if (turn == first) 
+        if (turn == first) {
+            clearText();
+            drawWinnerText("SECOND WIN!");
             printf("second win\n"); 
-        else
-            printf("first win\n"); 
+        } else {
+            clearText();
+            drawWinnerText("FIRST WIN!");
+            printf("first win\n");
+        }
         return 1;
     }
     else
         return 0;
+}
+
+void Game::drawTick(int x, int y) {
+    sf::Vertex line[] =
+    {
+        sf::Vertex(sf::Vector2f(x * (DISP_WIDTH / side), y * (DISP_WIDTH / side))),
+        sf::Vertex(sf::Vector2f((x+1) * (DISP_WIDTH / side), (y + 1) * (DISP_WIDTH / side)))
+    };
+
+    (*window).draw(line, 2, sf::Lines);
+    line[0] = sf::Vertex(sf::Vector2f((x + 1) * (DISP_WIDTH / side), y * (DISP_WIDTH / side)));
+    line[1] = sf::Vertex(sf::Vector2f(x * (DISP_WIDTH / side), (y + 1) * (DISP_WIDTH / side)));
+
+    (*window).draw(line, 2, sf::Lines);
+}
+
+void Game::drawRound(int x, int y) {
+    sf::CircleShape shape((DISP_WIDTH / side) / 2 - 4);
+    shape.move(sf::Vector2f(x * (DISP_WIDTH / side) + 4, y * (DISP_WIDTH / side) + 4));
+
+    shape.setOutlineThickness(2.f);
+    shape.setFillColor(sf::Color::Black);
+    shape.setOutlineColor(sf::Color::White);
+
+    (*window).draw(shape);
+}
+
+void Game::drawWinnerText(string winner) {
+    sf::Text text;
+    sf::Font font;
+    font.loadFromFile("roboto.ttf");
+    text.setFont(font);
+    text.setString(winner);
+    text.setCharacterSize(24);
+    text.setFillColor(sf::Color::Red);
+    text.setStyle(sf::Text::Bold | sf::Text::Underlined);
+    text.move(10, 340);
+
+    (*window).draw(text);
+    (*window).display();
+}
+
+void Game::drawInfo(int state) {
+    sf::Text text;
+    sf::Font font;
+    font.loadFromFile("roboto.ttf");
+    text.setFont(font);
+    if (state == 1) {
+        text.setString("Please wait...");
+    } else {
+        text.setString("You turn...");
+    }
+    text.setCharacterSize(24);
+    text.setFillColor(sf::Color::White);
+    text.setStyle(sf::Text::Bold | sf::Text::Underlined);
+    text.move(10, 340);
+
+    (*window).draw(text);
+    (*window).display();
+}
+
+void Game::clearText() {
+    sf::RectangleShape rectangle(sf::Vector2f(320.f, 80.f));
+    rectangle.move(0, 320);
+    rectangle.setFillColor(sf::Color::Black);
+
+    (*window).draw(rectangle);
+    (*window).display();
 }

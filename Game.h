@@ -2,7 +2,10 @@
 #define GAME_H
 
 #include <SFML/Graphics.hpp>
- 
+#include <string>
+
+using namespace std;
+
 #define DISP_WIDTH 320
 #define DISP_FULL_HEIGHT 400
 
@@ -31,6 +34,12 @@ public:
 
     void setRenderWindow(sf::RenderWindow *window);
     void renderGameField();
+    void drawTick(int x, int y);
+    void drawRound(int x, int y);
+
+    void drawInfo(int state);
+    void clearText();
+    void drawWinnerText(string winner);
 
     // static functions
     static void checkDisplayClosed(sf::RenderWindow *window);

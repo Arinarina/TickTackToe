@@ -4,6 +4,14 @@
 #include <unistd.h> 
 #include <string.h> 
 #include <iostream>
+#include <functional>
+
+#include <SFML/Graphics.hpp>
+
+int sizes = 5;
+#define DISP_WIDTH 320
+#define DISP_FULL_HEIGHT 400
+
 #include "Game.h"
 
 using namespace std;
@@ -12,6 +20,9 @@ using namespace std;
 
 int main(int argc, char const *argv[]) 
 { 
+    sf::RenderWindow window(sf::VideoMode(DISP_WIDTH, DISP_FULL_HEIGHT), "TickClient");
+    window.clear(sf::Color::Black);
+
 	int sock = 0, valread; 
 	struct sockaddr_in serv_addr;
 	char buffer[1024] = {0};
@@ -43,7 +54,14 @@ int main(int argc, char const *argv[])
 	cout << "The field size is " << fieldBuffer[0];
 	int sizes = fieldBuffer[0];
 	// создаем обьект класса игры
+
     Game *game = new Game(sizes);
+	game->setRenderWindow(&window);
+
+    window.clear(sf::Color::Black);
+	window.display();
+
+    game->renderGameField();
 
 	int myBuffer[2] = {0, 0};
 	int x, y;
@@ -52,6 +70,8 @@ int main(int argc, char const *argv[])
 	game->showInstruction();
 	// игровой цикл
 	while (!game->rowCrossed() && !game->columnCrossed() && !game->diagonalCrossed() && move != sizes*sizes) { 
+        game->clearText();
+        game->drawInfo(1);
         cout << "Waiting...." << endl;
 		// ждем пока придет ход соперника
 		valread = recv(sock, myBuffer, sizeof(int) * 2, 0);
@@ -64,10 +84,14 @@ int main(int argc, char const *argv[])
         game->showBoard();
 		// проверяем на победителя
 		int gameEnd = game->checkWin(move, game->second);
-        if (gameEnd) // если есть победитель, заканчиваем игру
+        if (gameEnd) { // если есть победитель, заканчиваем игру
+			sleep(4);
             break;
+		}
 		// вводим координаты для хода
 		cout << "Enter x, y" << endl;
+        game->clearText();
+        game->drawInfo(0);
 		cin >> x >> y;
 
 		myBuffer[0] = x;
@@ -84,8 +108,10 @@ int main(int argc, char const *argv[])
 		send(sock, myBuffer, sizeof(int) * 2, 0);
 		// проверяем на победителя
 		gameEnd = game->checkWin(move, game->first);
-        if (gameEnd)
+        if (gameEnd == 1) {
+			sleep(4);
             break;
+		}
 	}
 
 	return 0; 
