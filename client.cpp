@@ -55,19 +55,20 @@ int main(int argc, char const *argv[])
 	int sizes = fieldBuffer[0];
 	// создаем обьект класса игры
 
-    Game *game = new Game(sizes);
-	game->setRenderWindow(&window);
+    Game *game = Game::GetInstance(sizes);
+	(Game::GetInstance())->setRenderWindow(&window);
 
     window.clear(sf::Color::Black);
 	window.display();
 
-    game->renderGameField();
+    (Game::GetInstance())->renderGameField();
 
 	int myBuffer[2] = {0, 0};
 	int x, y;
 	int move = 0;
     int turn = game->first;
-	game->showInstruction();
+	(Game::GetInstance())->showInstruction();
+
 	// игровой цикл
 	while (!game->rowCrossed() && !game->columnCrossed() && !game->diagonalCrossed() && move != sizes*sizes) { 
         game->clearText();

@@ -3,7 +3,9 @@
 
 using namespace std;
 
-// конструктор без парааметров
+Game *Game::myGame = nullptr;
+
+// конструктор без параметров
 Game::Game() {
     first = 1;
     second = 2;
@@ -58,6 +60,35 @@ Game::~Game() {
     }
     delete[] board;
     delete[] moves;
+}
+
+Game *Game::GetInstance() {
+    if (myGame == nullptr) {
+        myGame = new Game();
+    }
+    return myGame;
+}
+
+Game *Game::GetInstance(int side) {
+    if (myGame == nullptr) {
+        myGame = new Game(side);
+    }
+    return myGame;
+}
+
+void Game::setSide(int side) {
+    this->side = side;
+}
+int Game::getSide() {
+    return side;
+}
+
+void Game::setWindow(sf::RenderWindow *window) {
+    this->window = window;
+}
+
+sf::RenderWindow *Game::getWindow() {
+    return window;
 }
 
 void Game::setRenderWindow(sf::RenderWindow *window) {

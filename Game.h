@@ -16,14 +16,31 @@ private:
     char** board;
     int *moves;
     sf::RenderWindow *window;
- 
-public:
+
     Game();
     Game(int side);
+
+protected:
+ 
+public:
+
+    static Game *myGame;
     ~Game();
+
+    void operator=(const Game &) = delete;
+    Game(Game &other) = delete;
+
     int first, second;
     char firstMove, secondMove;
- 
+
+    // Getters and Setters
+    void setSide(int side);
+    int getSide();
+
+    void setWindow(sf::RenderWindow *window);
+    sf::RenderWindow *getWindow();
+
+    // Functions
     void showBoard();
     void showInstruction();
     bool rowCrossed();
@@ -43,6 +60,8 @@ public:
 
     // static functions
     static void checkDisplayClosed(sf::RenderWindow *window);
+    static Game *GetInstance();
+    static Game *GetInstance(int side);
 };
- 
+
 #endif // GAME_H

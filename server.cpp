@@ -79,13 +79,13 @@ int main(int argc, char const *argv[])
     // задаем размеры игрового поля
     cout << "Field sizes is " << sizes << endl;
     // создаем игру
-    Game *game = new Game(sizes);
-    game->setRenderWindow(&window);
+    Game *game = Game::GetInstance(sizes);
+    (Game::GetInstance())->setRenderWindow(&window);
 
     // sf::Thread thread(std::bind(Game::checkDisplayClosed, &window), &game);
     // thread.launch();
 
-    game->renderGameField();
+    (Game::GetInstance())->renderGameField();
     
     // отсылаем клиенту размеры игрового поля
     int littleBuffer[1] = { sizes };
@@ -99,8 +99,8 @@ int main(int argc, char const *argv[])
     // устаанавливаем ход игры
     int turn = game->first;
     // показываем инструкцию и поле
-    game->showInstruction();
-    game->showBoard();
+    (Game::GetInstance())->showInstruction();
+    (Game::GetInstance())->showBoard();
     // игровой цикл
     while (!(game->rowCrossed()) && !(game->columnCrossed()) && !(game->diagonalCrossed()) && move != sizes*sizes) {
         // первым ходит сервер
